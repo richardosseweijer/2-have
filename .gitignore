@@ -6,3 +6,5 @@ artifacts/
 dist/
 *.log
 .DS_Store
+.project_id
+
