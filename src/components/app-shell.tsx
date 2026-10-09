@@ -40,7 +40,7 @@ function NavLink({
   later = false,
   exact = false,
 }: {
-  to: "/" | "/klanten" | "/artikelen" | "/offertes" | "/bestellingen" | "/projecten" | "/planning";
+  to: "/" | "/klanten" | "/artikelen" | "/offertes" | "/bestellingen" | "/inkoop" | "/projecten" | "/planning" | "/crew";
   label: string;
   later?: boolean;
   exact?: boolean;

@@ -13,6 +13,7 @@ export const Route = createFileRoute("/_app/offertes/new")({
 
 function NieuweOfferte() {
   const data = Route.useLoaderData();
+  const { org } = Route.useRouteContext();
   return (
     <div className="grid gap-5">
       <header>
@@ -30,7 +31,11 @@ function NieuweOfferte() {
           </Link>
         </p>
       ) : (
-        <OfferteForm customers={data.customers} articles={data.articles} />
+        <OfferteForm
+          customers={data.customers}
+          articles={data.articles}
+          defaultMarkupBps={org.defaultMarkupBps}
+        />
       )}
     </div>
   );

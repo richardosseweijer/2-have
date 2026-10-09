@@ -14,14 +14,18 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OrganisatieRouteImport } from './routes/organisatie'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppArtikelenRouteImport } from './routes/_app/artikelen'
+import { Route as AppCrewRouteImport } from './routes/_app/crew'
 import { Route as AppKlantenRouteImport } from './routes/_app/klanten'
 import { Route as AppPlanningRouteImport } from './routes/_app/planning'
-import { Route as AppProjectenRouteImport } from './routes/_app/projecten'
 import { Route as AppBestellingenIndexRouteImport } from './routes/_app/bestellingen/index'
 import { Route as AppBestellingenIdRouteImport } from './routes/_app/bestellingen/$id'
+import { Route as AppInkoopIndexRouteImport } from './routes/_app/inkoop/index'
+import { Route as AppInkoopIdRouteImport } from './routes/_app/inkoop/$id'
 import { Route as AppOffertesIndexRouteImport } from './routes/_app/offertes/index'
 import { Route as AppOffertesIdRouteImport } from './routes/_app/offertes/$id'
 import { Route as AppOffertesNewRouteImport } from './routes/_app/offertes/new'
+import { Route as AppProjectenIndexRouteImport } from './routes/_app/projecten/index'
+import { Route as AppProjectenIdRouteImport } from './routes/_app/projecten/$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const AppRoute = AppRouteImport.update({
@@ -48,6 +52,11 @@ const AppArtikelenRoute = AppArtikelenRouteImport.update({
   path: '/artikelen',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCrewRoute = AppCrewRouteImport.update({
+  id: '/crew',
+  path: '/crew',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppKlantenRoute = AppKlantenRouteImport.update({
   id: '/klanten',
   path: '/klanten',
@@ -58,11 +67,6 @@ const AppPlanningRoute = AppPlanningRouteImport.update({
   path: '/planning',
   getParentRoute: () => AppRoute,
 } as any)
-const AppProjectenRoute = AppProjectenRouteImport.update({
-  id: '/projecten',
-  path: '/projecten',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppBestellingenIndexRoute = AppBestellingenIndexRouteImport.update({
   id: '/bestellingen/',
   path: '/bestellingen/',
@@ -71,6 +75,16 @@ const AppBestellingenIndexRoute = AppBestellingenIndexRouteImport.update({
 const AppBestellingenIdRoute = AppBestellingenIdRouteImport.update({
   id: '/bestellingen/$id',
   path: '/bestellingen/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInkoopIndexRoute = AppInkoopIndexRouteImport.update({
+  id: '/inkoop/',
+  path: '/inkoop/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInkoopIdRoute = AppInkoopIdRouteImport.update({
+  id: '/inkoop/$id',
+  path: '/inkoop/$id',
   getParentRoute: () => AppRoute,
 } as any)
 const AppOffertesIndexRoute = AppOffertesIndexRouteImport.update({
@@ -88,6 +102,16 @@ const AppOffertesNewRoute = AppOffertesNewRouteImport.update({
   path: '/offertes/new',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProjectenIndexRoute = AppProjectenIndexRouteImport.update({
+  id: '/projecten/',
+  path: '/projecten/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjectenIdRoute = AppProjectenIdRouteImport.update({
+  id: '/projecten/$id',
+  path: '/projecten/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -99,30 +123,38 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/organisatie': typeof OrganisatieRoute
   '/artikelen': typeof AppArtikelenRoute
+  '/crew': typeof AppCrewRoute
   '/klanten': typeof AppKlantenRoute
   '/planning': typeof AppPlanningRoute
-  '/projecten': typeof AppProjectenRoute
   '/bestellingen/$id': typeof AppBestellingenIdRoute
+  '/inkoop/$id': typeof AppInkoopIdRoute
   '/offertes/$id': typeof AppOffertesIdRoute
   '/offertes/new': typeof AppOffertesNewRoute
+  '/projecten/$id': typeof AppProjectenIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/bestellingen/': typeof AppBestellingenIndexRoute
+  '/inkoop/': typeof AppInkoopIndexRoute
   '/offertes/': typeof AppOffertesIndexRoute
+  '/projecten/': typeof AppProjectenIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/organisatie': typeof OrganisatieRoute
   '/artikelen': typeof AppArtikelenRoute
+  '/crew': typeof AppCrewRoute
   '/klanten': typeof AppKlantenRoute
   '/planning': typeof AppPlanningRoute
-  '/projecten': typeof AppProjectenRoute
   '/': typeof AppIndexRoute
   '/bestellingen/$id': typeof AppBestellingenIdRoute
+  '/inkoop/$id': typeof AppInkoopIdRoute
   '/offertes/$id': typeof AppOffertesIdRoute
   '/offertes/new': typeof AppOffertesNewRoute
+  '/projecten/$id': typeof AppProjectenIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/bestellingen': typeof AppBestellingenIndexRoute
+  '/inkoop': typeof AppInkoopIndexRoute
   '/offertes': typeof AppOffertesIndexRoute
+  '/projecten': typeof AppProjectenIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -130,16 +162,20 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/organisatie': typeof OrganisatieRoute
   '/_app/artikelen': typeof AppArtikelenRoute
+  '/_app/crew': typeof AppCrewRoute
   '/_app/klanten': typeof AppKlantenRoute
   '/_app/planning': typeof AppPlanningRoute
-  '/_app/projecten': typeof AppProjectenRoute
   '/_app/': typeof AppIndexRoute
   '/_app/bestellingen/$id': typeof AppBestellingenIdRoute
+  '/_app/inkoop/$id': typeof AppInkoopIdRoute
   '/_app/offertes/$id': typeof AppOffertesIdRoute
   '/_app/offertes/new': typeof AppOffertesNewRoute
+  '/_app/projecten/$id': typeof AppProjectenIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_app/bestellingen/': typeof AppBestellingenIndexRoute
+  '/_app/inkoop/': typeof AppInkoopIndexRoute
   '/_app/offertes/': typeof AppOffertesIndexRoute
+  '/_app/projecten/': typeof AppProjectenIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -148,46 +184,58 @@ export interface FileRouteTypes {
     | '/login'
     | '/organisatie'
     | '/artikelen'
+    | '/crew'
     | '/klanten'
     | '/planning'
-    | '/projecten'
     | '/bestellingen/$id'
+    | '/inkoop/$id'
     | '/offertes/$id'
     | '/offertes/new'
+    | '/projecten/$id'
     | '/api/auth/$'
     | '/bestellingen/'
+    | '/inkoop/'
     | '/offertes/'
+    | '/projecten/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/organisatie'
     | '/artikelen'
+    | '/crew'
     | '/klanten'
     | '/planning'
-    | '/projecten'
     | '/'
     | '/bestellingen/$id'
+    | '/inkoop/$id'
     | '/offertes/$id'
     | '/offertes/new'
+    | '/projecten/$id'
     | '/api/auth/$'
     | '/bestellingen'
+    | '/inkoop'
     | '/offertes'
+    | '/projecten'
   id:
     | '__root__'
     | '/_app'
     | '/login'
     | '/organisatie'
     | '/_app/artikelen'
+    | '/_app/crew'
     | '/_app/klanten'
     | '/_app/planning'
-    | '/_app/projecten'
     | '/_app/'
     | '/_app/bestellingen/$id'
+    | '/_app/inkoop/$id'
     | '/_app/offertes/$id'
     | '/_app/offertes/new'
+    | '/_app/projecten/$id'
     | '/api/auth/$'
     | '/_app/bestellingen/'
+    | '/_app/inkoop/'
     | '/_app/offertes/'
+    | '/_app/projecten/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -234,6 +282,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppArtikelenRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/crew': {
+      id: '/_app/crew'
+      path: '/crew'
+      fullPath: '/crew'
+      preLoaderRoute: typeof AppCrewRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/klanten': {
       id: '/_app/klanten'
       path: '/klanten'
@@ -248,13 +303,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPlanningRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/projecten': {
-      id: '/_app/projecten'
-      path: '/projecten'
-      fullPath: '/projecten'
-      preLoaderRoute: typeof AppProjectenRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/bestellingen/': {
       id: '/_app/bestellingen/'
       path: '/bestellingen'
@@ -267,6 +315,20 @@ declare module '@tanstack/react-router' {
       path: '/bestellingen/$id'
       fullPath: '/bestellingen/$id'
       preLoaderRoute: typeof AppBestellingenIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/inkoop/': {
+      id: '/_app/inkoop/'
+      path: '/inkoop'
+      fullPath: '/inkoop/'
+      preLoaderRoute: typeof AppInkoopIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/inkoop/$id': {
+      id: '/_app/inkoop/$id'
+      path: '/inkoop/$id'
+      fullPath: '/inkoop/$id'
+      preLoaderRoute: typeof AppInkoopIdRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/offertes/': {
@@ -290,6 +352,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOffertesNewRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/projecten/': {
+      id: '/_app/projecten/'
+      path: '/projecten'
+      fullPath: '/projecten/'
+      preLoaderRoute: typeof AppProjectenIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projecten/$id': {
+      id: '/_app/projecten/$id'
+      path: '/projecten/$id'
+      fullPath: '/projecten/$id'
+      preLoaderRoute: typeof AppProjectenIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -302,28 +378,36 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppArtikelenRoute: typeof AppArtikelenRoute
+  AppCrewRoute: typeof AppCrewRoute
   AppKlantenRoute: typeof AppKlantenRoute
   AppPlanningRoute: typeof AppPlanningRoute
-  AppProjectenRoute: typeof AppProjectenRoute
   AppIndexRoute: typeof AppIndexRoute
   AppBestellingenIdRoute: typeof AppBestellingenIdRoute
+  AppInkoopIdRoute: typeof AppInkoopIdRoute
   AppOffertesIdRoute: typeof AppOffertesIdRoute
   AppOffertesNewRoute: typeof AppOffertesNewRoute
+  AppProjectenIdRoute: typeof AppProjectenIdRoute
   AppBestellingenIndexRoute: typeof AppBestellingenIndexRoute
+  AppInkoopIndexRoute: typeof AppInkoopIndexRoute
   AppOffertesIndexRoute: typeof AppOffertesIndexRoute
+  AppProjectenIndexRoute: typeof AppProjectenIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppArtikelenRoute: AppArtikelenRoute,
+  AppCrewRoute: AppCrewRoute,
   AppKlantenRoute: AppKlantenRoute,
   AppPlanningRoute: AppPlanningRoute,
-  AppProjectenRoute: AppProjectenRoute,
   AppIndexRoute: AppIndexRoute,
   AppBestellingenIdRoute: AppBestellingenIdRoute,
+  AppInkoopIdRoute: AppInkoopIdRoute,
   AppOffertesIdRoute: AppOffertesIdRoute,
   AppOffertesNewRoute: AppOffertesNewRoute,
+  AppProjectenIdRoute: AppProjectenIdRoute,
   AppBestellingenIndexRoute: AppBestellingenIndexRoute,
+  AppInkoopIndexRoute: AppInkoopIndexRoute,
   AppOffertesIndexRoute: AppOffertesIndexRoute,
+  AppProjectenIndexRoute: AppProjectenIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

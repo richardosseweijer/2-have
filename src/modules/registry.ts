@@ -1,7 +1,7 @@
 export type ModuleNavItem = {
   id: string;
   label: string;
-  href: "/klanten" | "/artikelen" | "/offertes" | "/bestellingen" | "/projecten" | "/planning";
+  href: "/klanten" | "/artikelen" | "/offertes" | "/bestellingen" | "/inkoop" | "/projecten" | "/planning" | "/crew";
   later: boolean;
 };
 
@@ -11,6 +11,8 @@ export const moduleNav: ModuleNavItem[] = [
   { id: "articles", label: "Artikelen", href: "/artikelen", later: false },
   { id: "quotes", label: "Offertes", href: "/offertes", later: false },
   { id: "orders", label: "Bestellingen", href: "/bestellingen", later: false },
-  { id: "projects", label: "Projecten", href: "/projecten", later: true },
-  { id: "planning", label: "Planning", href: "/planning", later: true },
+  { id: "purchases", label: "Inkoop", href: "/inkoop", later: false },
+  { id: "projects", label: "Projecten", href: "/projecten", later: false },
+  { id: "planning", label: "Planning", href: "/planning", later: false },
+  { id: "crew", label: "Crew", href: "/crew", later: false },
 ];

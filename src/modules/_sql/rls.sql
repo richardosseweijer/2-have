@@ -16,6 +16,10 @@ create policy orgs_select on orgs for select
 drop policy if exists orgs_insert on orgs;
 create policy orgs_insert on orgs for insert
   with check (current_setting('app.user_id', true) <> '');
+drop policy if exists orgs_update on orgs;
+create policy orgs_update on orgs for update
+  using (id in (select org_id from org_members where user_id = current_setting('app.user_id', true)))
+  with check (id in (select org_id from org_members where user_id = current_setting('app.user_id', true)));
 
 alter table org_members enable row level security;
 alter table org_members force row level security;
@@ -115,3 +119,79 @@ drop policy if exists assignments_all on assignments;
 create policy assignments_all on assignments for all
   using (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)))
   with check (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)));
+
+-- Catalog tables. Applied to existing databases by migrations/0003_articles_catalog.sql.
+alter table article_categories enable row level security;
+alter table article_categories force row level security;
+drop policy if exists article_categories_all on article_categories;
+create policy article_categories_all on article_categories for all
+  using (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)))
+  with check (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)));
+
+alter table article_category_links enable row level security;
+alter table article_category_links force row level security;
+drop policy if exists article_category_links_all on article_category_links;
+create policy article_category_links_all on article_category_links for all
+  using (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)))
+  with check (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)));
+
+-- Project dates and demand. Applied by migrations/0006_projects.sql.
+alter table project_days enable row level security;
+alter table project_days force row level security;
+drop policy if exists project_days_all on project_days;
+create policy project_days_all on project_days for all
+  using (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)))
+  with check (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)));
+
+alter table project_demands enable row level security;
+alter table project_demands force row level security;
+drop policy if exists project_demands_all on project_demands;
+create policy project_demands_all on project_demands for all
+  using (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)))
+  with check (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)));
+
+-- Shelf and movements. Applied by migrations/0007_stock.sql.
+alter table stock_balances enable row level security;
+alter table stock_balances force row level security;
+drop policy if exists stock_balances_all on stock_balances;
+create policy stock_balances_all on stock_balances for all
+  using (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)))
+  with check (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)));
+
+alter table stock_movements enable row level security;
+alter table stock_movements force row level security;
+drop policy if exists stock_movements_all on stock_movements;
+create policy stock_movements_all on stock_movements for all
+  using (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)))
+  with check (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)));
+
+-- Inkoop. Applied by migrations/0008_purchases.sql.
+alter table suppliers enable row level security;
+alter table suppliers force row level security;
+drop policy if exists suppliers_all on suppliers;
+create policy suppliers_all on suppliers for all
+  using (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)))
+  with check (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)));
+
+alter table purchase_counters enable row level security;
+alter table purchase_counters force row level security;
+drop policy if exists purchase_counters_all on purchase_counters;
+create policy purchase_counters_all on purchase_counters for all
+  using (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)))
+  with check (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)));
+
+alter table purchase_orders enable row level security;
+alter table purchase_orders force row level security;
+drop policy if exists purchase_orders_all on purchase_orders;
+create policy purchase_orders_all on purchase_orders for all
+  using (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)))
+  with check (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)));
+
+alter table purchase_lines enable row level security;
+alter table purchase_lines force row level security;
+drop policy if exists purchase_lines_all on purchase_lines;
+create policy purchase_lines_all on purchase_lines for all
+  using (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)))
+  with check (org_id in (select org_id from org_members where user_id = current_setting('app.user_id', true)));
+
+

@@ -32,12 +32,15 @@ export function OffertesPage({ quotes }: { quotes: QuoteSummary[] }) {
                 <Link
                   to="/offertes/$id"
                   params={{ id: quote.id }}
-                  className="grid gap-1 px-4 py-3 hover:bg-paper md:grid-cols-[8rem_minmax(0,1fr)_auto_auto] md:items-center md:gap-4 md:px-5"
+                  className="grid gap-1 px-4 py-3 hover:bg-paper md:grid-cols-[7rem_minmax(0,1fr)_auto_auto_auto] md:items-center md:gap-4 md:px-5"
                 >
                   <span className="font-semibold tabular-nums">{quote.number ?? "Concept"}</span>
                   <span>{quote.customerName}</span>
                   <StatusPill tone={tone[quote.status]}>{quoteStatusLabel[quote.status]}</StatusPill>
                   <span className="tabular-nums md:text-right">{formatEur(quote.totalCents)}</span>
+                  <span className="text-sm tabular-nums text-muted md:text-right">
+                    Marge {formatEur(quote.marginCents)}
+                  </span>
                 </Link>
               </li>
             ))}

@@ -1,7 +1,9 @@
 -- identity: organisations and membership. The shell owns no business tables.
+-- default_markup_bps is basis points (3500 = 35%). Applied by migrations/0004_quote_markup.sql.
 create table if not exists orgs (
   id uuid primary key,
   name text not null,
+  default_markup_bps integer not null default 0 check (default_markup_bps between 0 and 100000),
   created_at timestamptz not null default now()
 );
 

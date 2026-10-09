@@ -1,6 +1,15 @@
 # 2-have — instructions for further work
 
-The product is **2-have** (site 2-have.eu). Dutch UI. English identifiers. One TanStack Start app, one Postgres database, eight modules under `src/modules`. Read [ARCHITECTURE.md](ARCHITECTURE.md) for the narrative. This file is the contract.
+The product is **2-have** (site 2-have.eu). Dutch UI. English identifiers. One TanStack Start app, one Postgres database, eight modules under `src/modules`. Read [ARCHITECTURE.md](ARCHITECTURE.md) for the narrative and the roadmap. This file is the contract.
+
+## How to build
+
+- Follow the roadmap in ARCHITECTURE.md. One step, then check, then the next. Do not start a later step in the same change.
+- Do not parallelise steps.
+- Prefer a solid backend over a shortcut. Parse at the boundary and again in the use-case. `org_id` and forced RLS on every new table.
+- If a design conflict appears, stop and ask. Do not pick silently.
+- If a bug turns up, trace it and fix it, and mention it at the end of the step.
+- Keep ARCHITECTURE.md matched to what is actually built. A waiting step is not built.
 
 ## Do not
 
@@ -46,7 +55,7 @@ src/modules/<name>/
 
 `index.ts` of deals, orders, and quotes is what other modules call. `actions.ts` may dynamic-import `../identity` (the index) for `withOrg`. Importing your own `./usecases` from `actions.ts` is fine.
 
-Shell nav is `moduleNav` in `src/modules/registry.ts`. Projects and planning are `later: true`. Their tables exist; they have no use-cases. Build those use-cases in the module before adding behaviour to the page.
+Shell nav is `moduleNav` in `src/modules/registry.ts`. Planning assigns crew to a project day. Crew owns the people.
 
 ## Transaction and tenancy
 
@@ -64,12 +73,13 @@ Shell nav is `moduleNav` in `src/modules/registry.ts`. Projects and planning are
 3. `winDeal` from the deals index. Deal status `won`.
 4. `createFromQuote` from the orders index. Copies description, qty, unit, `unitPriceCents`, position. Order status `confirmed`. Allocates `ORD-####` from `order_counters`. Does not read `articles`.
 5. Quote status `accepted`.
+6. `createFromAcceptedQuote` from the projects index. One project. Copies article lines into demand. Skips a line with no article. Does not read or write stock.
 
-Reject calls `loseDeal`. Create quote calls `openDeal`. Status sets: quote `draft | sent | accepted | rejected`, deal `open | won | lost`, order `confirmed | in_progress | done | cancelled`.
+Reject calls `loseDeal`. Create quote calls `openDeal`. Status sets: quote `draft | sent | accepted | rejected`, deal `open | won | lost`, order `confirmed | in_progress | done | cancelled`, project `planned | in_progress | done | cancelled`. The SQL function `accept_quote` does not create a project; the screen uses the TypeScript path above.
 
 ## Schema changes
 
-Edit the module `schema.sql` so the folder still documents the table. Apply the change with a new file `migrations/0003_*.sql` (or the next number). Do not rewrite `migrations/0001_auth.sql` or `migrations/0002_business.sql` after they have run. `0002` is the concatenation of module `schema.sql` files plus `src/modules/_sql/{rls,grants,accept_quote}.sql`.
+Edit the module `schema.sql` so the folder still documents the table. Apply the change with the next `migrations/000N_*.sql`. Do not rewrite `migrations/0001_auth.sql` or `migrations/0002_business.sql`, and do not regenerate `0002` from the schema files. `0002` is the concatenation as it was when it first shipped. Later SQL, including new RLS policies and grants, lives only in the new migration. `src/modules/_sql/` stays the readable full picture, not a second copy to execute.
 
 ## Adding a module
 

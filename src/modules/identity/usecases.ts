@@ -1,6 +1,7 @@
 import { AppError } from "@/lib/app-error";
 import { withTransaction, type Tx } from "@/lib/db";
-import { createOrgInput, type OrgContext } from "./boundary";
+import { asNumber } from "@/lib/money";
+import { createOrgInput, setDefaultMarkupInput, type OrgContext } from "./boundary";
 
 async function armRls(tx: Tx, userId: string): Promise<void> {
   await tx.query(`select set_config('app.user_id', $1, true)`, [userId]);
@@ -15,14 +16,26 @@ async function armRls(tx: Tx, userId: string): Promise<void> {
 }
 
 export async function currentOrg(tx: Tx, userId: string): Promise<OrgContext | null> {
-  const rows = await tx.query<{ id: string; name: string; role: "owner" | "member" }>(
-    `select o.id, o.name, m.role
+  const rows = await tx.query<{
+    id: string;
+    name: string;
+    role: "owner" | "member";
+    default_markup_bps: unknown;
+  }>(
+    `select o.id, o.name, m.role, o.default_markup_bps
        from org_members m
        join orgs o on o.id = m.org_id
       where m.user_id = $1`,
     [userId],
   );
-  return rows[0] ?? null;
+  const row = rows[0];
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    role: row.role,
+    defaultMarkupBps: asNumber(row.default_markup_bps),
+  };
 }
 
 export async function createOrg(
@@ -38,7 +51,24 @@ export async function createOrg(
     `insert into org_members (org_id, user_id, role) values ($1, $2, 'owner')`,
     [id, input.userId],
   );
-  return { id, name, role: "owner" };
+  return { id, name, role: "owner", defaultMarkupBps: 0 };
+}
+
+/** Changes the default for new quotes. Does not rewrite quotes that already exist. */
+export async function setDefaultMarkup(
+  tx: Tx,
+  input: { orgId: string; markupBps: number },
+): Promise<{ defaultMarkupBps: number }> {
+  const data = setDefaultMarkupInput.parse({ markupBps: input.markupBps });
+  const rows = await tx.query<{ default_markup_bps: unknown }>(
+    `update orgs
+        set default_markup_bps = $2
+      where id = $1
+      returning default_markup_bps`,
+    [input.orgId, data.markupBps],
+  );
+  if (!rows[0]) throw new AppError("De opslag kon niet worden opgeslagen.");
+  return { defaultMarkupBps: asNumber(rows[0].default_markup_bps) };
 }
 
 /** Opens one transaction, sets the caller, then runs `fn`. */

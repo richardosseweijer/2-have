@@ -1,8 +1,11 @@
 import { Link } from "@tanstack/react-router";
+import { DefaultMarkupForm } from "@/modules/identity/components/default-markup-form";
 import { Panel, StatusPill } from "@/components/ui";
-import { formatEur } from "@/lib/money";
+import { formatEur, formatQty } from "@/lib/money";
+import type { LateMaterial } from "@/lib/coverage";
 import { quoteStatusLabel, type QuoteSummary } from "@/modules/quotes";
 import type { OrderSummary } from "@/modules/orders";
+import type { StaffingGap } from "@/modules/planning";
 
 const tone = {
   draft: "neutral",
@@ -13,23 +16,74 @@ const tone = {
 
 export function Dashboard({
   orgName,
+  defaultMarkupBps,
   customerCount,
   articleCount,
   quotes,
   orders,
+  lateMaterials,
+  staffingGaps,
 }: {
   orgName: string;
+  defaultMarkupBps: number;
   customerCount: number;
   articleCount: number;
   quotes: QuoteSummary[];
   orders: OrderSummary[];
+  lateMaterials: LateMaterial[];
+  staffingGaps: StaffingGap[];
 }) {
   return (
     <div className="grid gap-6">
       <header>
         <p className="text-sm text-muted">Organisatie</p>
         <h1 className="font-display text-4xl tracking-tight">{orgName}</h1>
+        <DefaultMarkupForm markupBps={defaultMarkupBps} />
       </header>
+      <div className="grid gap-3 lg:grid-cols-2">
+        <Panel>
+          <h2 className="font-display text-2xl">Materiaal, 7 dagen</h2>
+          {lateMaterials.length === 0 ? (
+            <p className="mt-2 text-sm text-muted">Niets te laat. Wat onderweg is en op tijd komt telt mee.</p>
+          ) : (
+            <ul className="mt-2">
+              {lateMaterials.map((row) => (
+                <li key={`${row.projectId}-${row.articleId}`} className="border-t border-line">
+                  <Link
+                    to="/projecten/$id"
+                    params={{ id: row.projectId }}
+                    className="block py-3"
+                  >
+                    <span className="font-semibold">{row.description}</span>
+                    <span className="mt-0.5 block text-sm text-muted">
+                      {row.projectName} · {row.earliestDate} · tekort {formatQty(row.qtyShort)} {row.unit}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+        <Panel>
+          <h2 className="font-display text-2xl">Bemanning, 7 dagen</h2>
+          {staffingGaps.length === 0 ? (
+            <p className="mt-2 text-sm text-muted">Geen dag onderbezet. Alleen bevestigde mensen tellen.</p>
+          ) : (
+            <ul className="mt-2">
+              {staffingGaps.map((day) => (
+                <li key={`${day.projectId}-${day.workDate}`} className="border-t border-line">
+                  <Link to="/planning" className="block py-3">
+                    <span className="font-semibold">{day.projectName}</span>
+                    <span className="mt-0.5 block text-sm text-muted">
+                      {day.workDate} · {day.confirmed} van {day.requiredCrew} bevestigd
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+      </div>
       <div className="grid gap-3 sm:grid-cols-3">
         <Stat label="Klanten" value={String(customerCount)} href="/klanten" />
         <Stat label="Artikelen" value={String(articleCount)} href="/artikelen" />
