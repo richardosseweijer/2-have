@@ -1,6 +1,8 @@
 # 2-have — instructions for further work
 
-The product is **2-have** (site 2-have.eu). Dutch UI. English identifiers. One TanStack Start app, one Postgres database, eight modules under `src/modules`. Read [ARCHITECTURE.md](ARCHITECTURE.md) for the narrative and the roadmap. This file is the contract.
+The product is **2-have** (site 2-have.eu). Dutch UI. English identifiers. One TanStack Start app, one Postgres database, eight modules under `src/modules`. Read [ARCHITECTURE.md](ARCHITECTURE.md) for the narrative and the roadmap. This file is the contract for modules and money.
+
+Access control and personal data are not in this file. [security_guidelines.md](security_guidelines.md) is mandatory and wins over this file, over ARCHITECTURE.md, and over a feature request. Open gaps, including GDPR, are [security_issues.md](security_issues.md). Do not claim the app is invite-only or GDPR compliant while those gaps are open.
 
 ## How to build
 
@@ -61,8 +63,9 @@ Shell nav is `moduleNav` in `src/modules/registry.ts`. Planning assigns crew to 
 
 - `identity.withOrg(userId, fn)` opens the transaction, sets `app.user_id`, switches to role `app_user` when the connection is a superuser, loads the org, then runs `fn(tx, org)`.
 - Every query in a use-case takes that `tx`. Do not call `getSql()` inside a use-case.
-- First user creates an org and is `owner`. One org per user (unique on `org_members.user_id`).
-- New tables: `org_id` not null, RLS enabled and forced, policy matching the `org_members` predicate used in `src/modules/_sql/rls.sql`.
+- What is built today: the first user creates an org and is `owner`. One org per user. Any member can read every row in that org. That is not the allowed end state.
+- What must be built: invitation-only access, an admin who can add, change, and revoke access, and users limited to their own rows plus an explicit admin grant. See security_guidelines.md §1 and §2. Do not add another table that copies the current "any member sees the whole org" policy once grants exist.
+- New tables: `org_id` not null, RLS enabled and forced. Until grants exist, also require `created_by` when the row can belong to one user. Do not store a new category of personal data without updating the register in security_guidelines.md §5.
 
 ## Accept path (do not split)
 

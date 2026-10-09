@@ -110,9 +110,9 @@ Money is integer cents. Quantity is numeric. Line totals round `qty * unit_price
 
 ## Who can see a row
 
-Signing up creates a user. The first screen after that asks for an organisation; that user becomes the owner. A user belongs to exactly one organisation (`org_members` has one row per user).
+What is built: signing up creates a user. The first screen after that asks for an organisation; that user becomes the owner. A user belongs to exactly one organisation (`org_members` has one row per user). Every business table has `org_id`. Row-level security is on, and forced. Each transaction sets `app.user_id`. Policies only return rows whose organisation the current user belongs to. A preview database connects as a superuser, which would skip those policies, so the transaction switches to the role `app_user` when that role exists.
 
-Every business table has `org_id`. Row-level security is on, and forced. Each transaction sets `app.user_id`. Policies only return rows whose organisation the current user belongs to. A preview database connects as a superuser, which would skip those policies, so the transaction switches to the role `app_user` when that role exists.
+That is not the allowed access model. The app must become invitation-only. An admin adds, changes, and revokes access. A user sees only their own rows and what an admin granted. Personal data follows the EU rules in [security_guidelines.md](security_guidelines.md). Those rules are not implemented. The gaps are [security_issues.md](security_issues.md). Do not describe the paragraph above as compliance.
 
 Auth is email and password. The migration that creates the auth tables is separate from the business migration.
 

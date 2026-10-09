@@ -2,7 +2,7 @@
 
 One app, one Postgres database. Eight business modules. Dutch screens, English names in code and columns. The product name is **2-have** (site [2-have.eu](https://2-have.eu)).
 
-How the pieces fit, and how to add the next module: [ARCHITECTURE.md](ARCHITECTURE.md). Rules for anyone (or any agent) changing the code: [AGENTS.project.md](AGENTS.project.md).
+How the pieces fit, and how to add the next module: [ARCHITECTURE.md](ARCHITECTURE.md). Rules for anyone (or any agent) changing the code: [AGENTS.project.md](AGENTS.project.md). Access control and EU personal-data rules: [security_guidelines.md](security_guidelines.md). Open gaps: [security_issues.md](security_issues.md).
 
 ## Module rule
 

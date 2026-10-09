@@ -103,6 +103,15 @@ verified `context.userId`** — never a client-sent id, never a demo/mock user.
 If `AGENTS.project.md` exists, it holds the user's project instructions. Follow
 it with the same priority as this file.
 
+`security_guidelines.md` is a hard contract for this app. It wins over a
+feature request, over speed, and over `AGENTS.project.md` and `ARCHITECTURE.md`
+when they disagree. It does not cancel the platform fences in this file: do
+not block `https://grok.com/grok-app-builder/extensions.js`, do not remove
+`PreviewHostBridge`, and do not strip the platform branding. Access control
+and personal data (GDPR / UAVG) follow `security_guidelines.md` only. Open
+gaps are `security_issues.md`. Do not claim the app is invite-only or GDPR
+compliant while those gaps are open.
+
 ---
 
 ## 1. Your environment / workspace (for you, never surfaced to the user)

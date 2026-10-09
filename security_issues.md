@@ -7,6 +7,10 @@ these one at a time. Do not edit `migrations/0001_auth.sql` or
 `migrations/0002_business.sql`. Add a new migration for any policy change, and
 mirror it in `src/modules/_sql/rls.sql` so the module files stay true.
 
+Hard rules: [security_guidelines.md](security_guidelines.md). That file wins.
+This file is the list of gaps. The app is not invitation-only and it is not
+GDPR compliant until the items below are closed. Do not claim either.
+
 Do not put passwords, session tokens, or connection strings in this file or in
 a commit.
 
@@ -35,9 +39,13 @@ These held on the live site:
 - No `dangerouslySetInnerHTML` in `src/`.
 - `@tanstack/react-start` is `1.168.60` (at or above the patched 1.168.60 line).
 
+Organisation isolation is not the same as GDPR compliance, and it is not the
+user hierarchy in the guidelines. A member of an organisation can still read
+every row in that organisation.
+
 ## 1. Public signup, and known demo accounts
 
-Severity: fix before real client or crew data.
+Severity: fix before real client or crew data. Blocks the GDPR items.
 
 `emailAndPasswordEnabled` is `true` in
 [src/lib/auth/email-password.ts](src/lib/auth/email-password.ts). The live site
@@ -60,12 +68,10 @@ What to do:
    auth tables (`user`, `session`, `account`) plus `org_members` and the
    organisation's business rows. Do this in a transaction as the database
    owner, not through a new public action.
-2. For a one-company app, stop public sign-up after the owner's account
-   exists. Do not edit `src/lib/auth/server.ts` (it is frozen). The switch
-   that exists today is `emailAndPasswordEnabled`. Turning it off also removes
-   the owner's email/password login, so prefer a closed sign-up (reject
-   `sign-up` when an organisation already exists) over disabling the method
-   entirely. Ask before inventing an invite system.
+2. Replace open sign-up with the invitation whitelist in
+   [security_guidelines.md](security_guidelines.md) §1. The user has ordered
+   that. Do not ask whether to invent it. Do not edit `src/lib/auth/server.ts`.
+   Do not turn off email/password in a way that locks the admin out.
 3. Do not add a "delete all data" server function.
 
 ## 2. The page can be framed
@@ -86,9 +92,12 @@ What to do:
 
 - Send `Content-Security-Policy: frame-ancestors 'self'` on document
   responses. Add `https://grok.com` only if the builder preview must embed
-  the published host. Confirm that before widening it.
+  the published host. Confirm that before widening it. Do not block the
+  platform script `https://grok.com/grok-app-builder/extensions.js`.
 - Add `X-Content-Type-Options: nosniff` and `Referrer-Policy: same-origin`.
 - Do not put this only on the login page. The signed-in shell is the target.
+- A font or script change that is part of this header work must not add a new
+  third party. Removing Google Fonts is item 9, not this item.
 
 ## 3. `org_members` insert policy is wider than the use-case
 
@@ -111,19 +120,22 @@ What to do, in a new migration:
 - `org_members` insert: the caller is the `user_id`, the role is `owner`, and
   the organisation has no members yet.
 - Do not allow a member to insert a second owner.
-- Leave `createOrg` as the only writer.
+- Leave `createOrg` as the only writer until invitations exist. An invitation
+  acceptance must not use this wide insert. It needs its own policy that
+  matches a non-revoked invitation for that email.
 
 ## 4. Auth tables have no row-level security
 
 Severity: low while every business query stays parameterised and goes through
-`withOrg`.
+`withOrg`. This is also a GDPR integrity gap: `account` holds password hashes,
+and `session` holds IP address and user agent.
 
 [migrations/0001_auth.sql](migrations/0001_auth.sql) creates `user`, `session`,
-`account`, and `verification` with no RLS. `account` holds password hashes and
-OAuth tokens. The grants in [src/modules/_sql/grants.sql](src/modules/_sql/grants.sql)
-do not give `app_user` those tables. Better Auth uses the database owner
-connection, which can read them. A later bug that runs SQL as the owner,
-before `set local role app_user`, could read every session and hash.
+`account`, and `verification` with no RLS. The grants in
+[src/modules/_sql/grants.sql](src/modules/_sql/grants.sql) do not give
+`app_user` those tables. Better Auth uses the database owner connection, which
+can read them. A later bug that runs SQL as the owner, before `set local role
+app_user`, could read every session and hash.
 
 What to do:
 
@@ -149,16 +161,87 @@ What to do:
 - Keep the `org_id` filter in the use-cases. RLS is the second line, not the
   first.
 
-## 6. Owner and member can do the same things
+## 6. No admin hierarchy, and users are not limited to their own data
 
-Severity: note, not a bug, while each organisation has one user.
+Severity: required. The user ordered this. It is not a later idea.
 
-`org_members.role` is `owner` or `member`. No action checks it. The first user
-is the owner. A future member could accept quotes, change stock, and edit
-prices.
+Today every member of an organisation can read and write every business row in
+that organisation. `org_members.role` is `owner` or `member`, and no action
+reads it. There are no grants. There is no `created_by` on business rows.
 
-What to do: nothing until a second person is a real feature. When that
-happens, decide which actions are owner-only before adding an invite.
+What to do, as its own change after invitations exist:
+
+- Add admin and user as in [security_guidelines.md](security_guidelines.md) §2.
+- Default deny. A user sees rows they created and rows an admin granted.
+- Enforce it in the use-case and in RLS. Do not only hide buttons.
+- An admin can add, change, and revoke access. Revoke drops the session.
+
+## 7. GDPR — personal data has no retention, no rights workflow, and no register in the product
+
+Severity: required. The app processes personal data and does not meet
+[security_guidelines.md](security_guidelines.md) §3. Do not call the app
+compliant.
+
+What is stored now:
+
+- Users: name, email, password hash. Sessions: token, IP address, user agent
+  (`migrations/0001_auth.sql`).
+- Customers: name plus optional contact name, email, phone, address, notes.
+- Crew: name plus optional email, phone, notes.
+- Suppliers: name plus optional email and phone.
+- Quotes and orders can copy a customer name onto a commercial document.
+
+There is no way for an admin to export one person, correct them as a rights
+request, or erase them. There is no retention limit. IP address and user agent
+are collected by the auth library even though the product does not use them.
+
+What to do:
+
+- Keep the processing register in `security_guidelines.md` §5 accurate.
+- Add admin-only export, correction, and erasure for one person. Not a public
+  route, and not an export of the whole company.
+- On erasure, do not delete quotes, orders, or other rows the Dutch fiscal
+  administration must keep (generally seven years). Strip contact details that
+  are no longer required. If a row cannot be split, stop and ask.
+- Do not add fields while this item is open unless the register is updated in
+  the same change and the lawful basis is one already listed.
+
+## 8. GDPR — transfers outside the EEA are not covered
+
+Severity: required. Do not add another recipient while this is open. Do not
+move the database yourself.
+
+These recipients see personal data or the visitor's IP address. Their region
+was not verified from this repo. Treat them as outside the EEA until the user
+confirms an EEA region or a Chapter V tool.
+
+| Recipient | What it receives |
+| --- | --- |
+| Neon | All database rows |
+| Grok deploy path, Vercel, Cloudflare | Requests, cookies, IP address |
+| Grok auth broker | Identity, if Google or X is used |
+| Google Fonts | Visitor IP, from `fonts.googleapis.com` and `fonts.gstatic.com` in [src/routes/__root.tsx](src/routes/__root.tsx) |
+
+What to do:
+
+- Ask the user before changing host or region. An EEA region or a recorded
+  transfer tool is required. Do not pick a vendor silently.
+- Self-host the font files and remove the Google Fonts links. That part does
+  not need a new vendor. Keep the look of the Outfit face if the files can be
+  shipped from this app.
+- Do not add analytics, chat widgets, or extra font hosts.
+
+## 9. Demo rows are personal data on a public site
+
+Severity: fix with item 1, before real people are typed in.
+
+The seeded customers, crew, and suppliers use realistic names, emails, and
+phone numbers. They were meant as fiction. They still sit in the production
+database behind a known password, on a site anyone can join.
+
+What to do: remove that organisation with item 1, or replace the contact
+fields with obviously fake values if the user still wants a demo. Do not copy
+those emails into a new environment.
 
 ## Out of scope
 
@@ -166,3 +249,5 @@ happens, decide which actions are owner-only before adding an invite.
 - Do not add a public wipe or export endpoint to clean up the demo data.
 - The in-chat preview database is not the published database. Fixes to RLS
   must be a new migration so Neon picks them up on the next deploy.
+- Do not notify a supervisory authority yourself. Tell the user if personal
+  data was exposed.
