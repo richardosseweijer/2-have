@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+/* 2-have press kit. Sampled from the mark. Use these tokens; no extra hues. */
+@theme {
+  --font-display: "Outfit", "Avenir Next", "Segoe UI", sans-serif;
+  --font-sans: "Outfit", "Avenir Next", "Segoe UI", sans-serif;
+
+  --color-navy: #002083;
+  --color-navy-2: #1a3c9c;
+  --color-orange: #fc4f00;
+  --color-amber: #ff9d25;
+  --color-sky: #479fe7;
+
+  --color-paper: #f4f7fb;
+  --color-paper-2: #ffffff;
+  --color-ink: #071433;
+  --color-muted: #5a6a86;
+  --color-line: #d7e0ee;
+  --color-card: #ffffff;
+
+  --color-ok: #0f7a45;
+  --color-ok-soft: #e5f6ee;
+  --color-warn: #8a4e00;
+  --color-warn-soft: #fff1dc;
+  --color-bad: #9d2b2b;
+  --color-bad-soft: #fdecec;
+
+  --radius-card: 1.25rem;
+  --radius-control: 0.625rem;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  body {
+    min-height: 100vh;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  h1, h2, .font-display {
+    font-family: var(--font-display);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition: none !important;
+    }
+  }
+}
